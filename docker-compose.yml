@@ -1,0 +1,62 @@
+version: '3'
+services:
+  proxy:
+    image: staticfloat/nginx-certbot
+    restart: always
+    container_name: 'main_proxy'
+    environment:
+      CERTBOT_EMAIL: "examplev@examplev.ru"
+      TZ: Europe/Moscow
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./conf.d:/etc/nginx/user.conf.d:ro
+      - ./certbot_extra_domains:/etc/certbot/extra_domains:ro
+      - /var/www/.well-known/assetlinks.json:/var/www/assetlinks.json
+    networks:
+      - nginx.docker
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    container_name: 'rabbitmq'
+    environment:
+      RABBITMQ_USERNAME: test
+      RABBITMQ_PASSWORD: test
+      TZ: Europe/Moscow
+    ports:
+      - 16000:15672
+    networks:
+      - nginx.docker
+
+  db_test:
+    image: postgres
+    restart: always
+    container_name: 'db_prod'
+    environment:
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+      TZ: Europe/Moscow
+    ports:
+        - 15000:5432
+#    volumes:
+#        - ./data:/var/lib/postgresql/data
+    networks:
+        - nginx.docker
+
+  sql_server:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    container_name: sql_server
+    ports:
+        - "14330:14330"
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=test
+        - MSSQL_PID=Express
+
+
+networks:
+  nginx.docker:
+    name: nginx.docker
+    external: true
