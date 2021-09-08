@@ -13,7 +13,6 @@ services:
     volumes:
       - ./conf.d:/etc/nginx/user.conf.d:ro
       - ./certbot_extra_domains:/etc/certbot/extra_domains:ro
-      - /var/www/.well-known/assetlinks.json:/var/www/assetlinks.json
     networks:
       - nginx.docker
 
